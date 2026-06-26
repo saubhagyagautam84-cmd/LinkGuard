@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./linkguard.db"
+}
+
+model User {
+  id              String          @id @default(uuid())
+  first_name      String
+  last_name       String          @default("")
+  email           String          @unique
+  role            String          @default("")
+  bio             String          @default("")
+  created_at      DateTime        @default(now())
+  links           Link[]
+  trusted_domains TrustedDomain[]
+}
+
+model Link {
+  id         String   @id @default(uuid())
+  label      String
+  url        String
+  domain     String
+  trust      String   @default("caution")
+  added_by   String
+  user       User     @relation(fields: [added_by], references: [id])
+  created_at DateTime @default(now())
+}
+
+model TrustedDomain {
+  id         String   @id @default(uuid())
+  domain     String
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id])
+  created_at DateTime @default(now())
+
+  @@unique([domain, user_id])
+}

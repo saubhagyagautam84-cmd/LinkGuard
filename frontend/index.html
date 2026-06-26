@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+    <title>LinkGuard</title>
+    <meta name="description" content="AI-powered phishing link detector. Scan any URL instantly." />
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Theme color — Android status bar + browser chrome -->
+    <meta name="theme-color" content="#4F46E5" />
+
+    <!-- iOS PWA — looks like native app when added to home screen -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LinkGuard" />
+    <link rel="apple-touch-icon" href="/icons/icon192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon512.png" />
+
+    <!-- Prevent phone number auto-detection -->
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="48x48" href="/icons/icon48.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon16.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+# ── Node modules (all levels) ─────────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+frontend/dist/
+
+# ── Environment / secrets — NEVER commit ─────────────────────────────────────
+.env
+*.env
+backend/.env
+.env.local
+.env.backup
+
+# ── Database ──────────────────────────────────────────────────────────────────
+backend/prisma/*.db
+backend/prisma/*.db-journal
+*.sqlite
+*.sqlite3
+
+# ── Expo / React Native ───────────────────────────────────────────────────────
+.expo/
+.expo-shared/
+*.orig.*
+web-build/
+
+# ── Android build caches (keep source, ignore build output) ───────────────────
+frontend/android/.gradle/
+frontend/android/build/
+frontend/android/app/build/
+frontend/android/local.properties
+frontend/android/app/src/main/assets/public/
+frontend/android/app/src/main/assets/capacitor.config.json
+frontend/android/app/src/main/assets/capacitor.plugins.json
+frontend/android/app/src/main/res/xml/config.xml
+frontend/android/capacitor-cordova-android-plugins/
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ── OS / IDE ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

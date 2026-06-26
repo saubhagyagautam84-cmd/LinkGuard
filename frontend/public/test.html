@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>LinkGuard — Test Page</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F3F4F6;min-height:100vh;padding:20px 16px 48px}
+
+    .header{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:14px 16px;background:#fff;border-radius:16px;border:1px solid #E5E7EB}
+    .logo{width:36px;height:36px;background:#4F46E5;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .logo svg{width:18px;height:18px}
+    .header h1{font-size:15px;font-weight:700;color:#111827}
+    .header p{font-size:11px;color:#6B7280;margin-top:1px}
+
+    .badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:#EEF2FF;color:#4F46E5;margin-bottom:14px}
+    .section{background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:16px;margin-bottom:14px;overflow:hidden}
+    .section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .safe-title{color:#059669}.phishing-title{color:#DC2626}
+
+    .link-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;margin-bottom:8px;cursor:pointer;text-decoration:none;transition:opacity .15s;border:1px solid transparent;-webkit-user-select:none;user-select:none}
+    .link-item:active{opacity:.7}
+    .link-item:last-child{margin-bottom:0}
+    .safe-item{background:#F0FDF4;border-color:#BBF7D0}
+    .phish-item{background:#FEF2F2;border-color:#FECACA}
+    .link-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+    .safe-item .link-icon{background:#DCFCE7}
+    .phish-item .link-icon{background:#FEE2E2}
+    .link-text{flex:1;min-width:0}
+    .link-text strong{display:block;font-size:12px;color:#111827;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .link-text span{font-size:10px;color:#6B7280}
+    .link-arrow{color:#9CA3AF;flex-shrink:0}
+
+    /* Spinner overlay */
+    #spinner{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+    #spinner.show{display:flex}
+    .spin{width:40px;height:40px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+    #spinner p{color:#fff;font-size:13px;font-weight:500}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Popup overlay */
+    #popup{display:none;position:fixed;inset:0;z-index:200;align-items:flex-end;justify-content:center;padding:0}
+    #popup.show{display:flex}
+    .popup-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+    .popup-sheet{position:relative;z-index:1;width:100%;max-width:480px;border-radius:24px 24px 0 0;overflow:hidden;animation:slideUp .3s cubic-bezier(.32,1.1,.6,1)}
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+    /* Phishing popup */
+    .popup-danger .popup-top{background:linear-gradient(135deg,#DC2626,#B91C1C);padding:28px 20px 20px;display:flex;flex-direction:column;align-items:center}
+    .popup-safe .popup-top{background:linear-gradient(135deg,#059669,#047857);padding:28px 20px 20px;display:flex;flex-direction:column;align-items:center}
+    .popup-icon{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+    .popup-icon svg{width:30px;height:30px}
+    .popup-top h2{color:#fff;font-size:17px;font-weight:700;text-align:center}
+    .popup-top p{color:rgba(255,255,255,.8);font-size:12px;text-align:center;margin-top:4px}
+
+    .popup-body{background:#fff;padding:18px 20px 8px}
+    .url-box{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:10px 12px;margin-bottom:14px}
+    .url-box .label{font-size:10px;color:#9CA3AF;margin-bottom:2px;font-weight:500}
+    .url-box .url{font-size:12px;color:#374151;word-break:break-all;font-family:monospace}
+
+    .reasons{margin-bottom:14px}
+    .reasons .reason-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #F9FAFB}
+    .reasons .reason-item:last-child{border-bottom:none}
+    .reason-dot{width:6px;height:6px;border-radius:50%;background:#EF4444;flex-shrink:0;margin-top:5px}
+    .reason-text{font-size:12px;color:#374151;line-height:1.4}
+
+    .score-bar{margin-bottom:16px}
+    .score-bar .label{font-size:11px;color:#6B7280;margin-bottom:6px;display:flex;justify-content:space-between}
+    .bar-track{height:6px;background:#F3F4F6;border-radius:3px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+    .bar-high{background:linear-gradient(90deg,#EF4444,#DC2626)}
+    .bar-low{background:linear-gradient(90deg,#10B981,#059669)}
+
+    .popup-actions{background:#fff;padding:0 20px 20px;display:flex;flex-direction:column;gap:8px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
+    .btn{width:100%;padding:13px;border-radius:12px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:opacity .15s}
+    .btn:active{opacity:.8}
+    .btn-danger{background:#DC2626;color:#fff}
+    .btn-safe{background:#059669;color:#fff}
+    .btn-ghost{background:#F3F4F6;color:#374151}
+
+    .note{background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:12px 14px;font-size:11px;color:#92400E;line-height:1.5;margin-bottom:14px}
+    .handle{width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:0 auto 4px}
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <svg fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </div>
+    <div>
+      <h1>LinkGuard — Test Page</h1>
+      <p>Tap any link below to test phishing detection</p>
+    </div>
+  </div>
+
+  <div class="note">
+    ✅ <strong>Works on phone &amp; all browsers</strong> — this page has a built-in scanner. No extension needed.
+    Make sure your PC backend is running on port 3001.
+  </div>
+
+  <!-- Safe links -->
+  <div class="section">
+    <div class="section-title safe-title">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      Safe Links — should open normally
+    </div>
+    <a class="link-item safe-item" href="https://github.com" data-scan="true">
+      <div class="link-icon">🐙</div>
+      <div class="link-text"><strong>github.com</strong><span>Code hosting platform</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="link-item safe-item" href="https://google.com" data-scan="true">
+      <div class="link-icon">🔍</div>
+      <div class="link-text"><strong>google.com</strong><span>Search engine</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="link-item safe-item" href="https://linkedin.com" data-scan="true">
+      <div class="link-icon">💼</div>
+      <div class="link-text"><strong>linkedin.com</strong><span>Professional network</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="link-item safe-item" href="https://amazon.in" data-scan="true">
+      <div class="link-icon">📦</div>
+      <div class="link-text"><strong>amazon.in</strong><span>Official Amazon India</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+
+  <!-- Phishing links -->
+  <div class="section">
+    <div class="section-title phishing-title">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Phishing Test Links — should show RED warning
+    </div>
+    <a class="link-item phish-item" href="http://paypa1-secure.xyz" data-scan="true">
+      <div class="link-icon">🎣</div>
+      <div class="link-text"><strong>paypa1-secure.xyz</strong><span>PayPal typosquat (leet: 1→l)</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="link-item phish-item" href="http://sbi-netbanking.tk" data-scan="true">
+      <div class="link-icon">🏦</div>
+      <div class="link-text"><strong>sbi-netbanking.tk</strong><span>Fake SBI banking site</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="link-item phish-item" href="http://hdfc-bank-login.ml" data-scan="true">
+      <div class="link-icon">🏦</div>
+      <div class="link-text"><strong>hdfc-bank-login.ml</strong><span>Fake HDFC login page</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="link-item phish-item" href="http://google-account-verify.online" data-scan="true">
+      <div class="link-icon">🎭</div>
+      <div class="link-text"><strong>google-account-verify.online</strong><span>Fake Google verification</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="link-item phish-item" href="http://irctc-refund.online" data-scan="true">
+      <div class="link-icon">🚂</div>
+      <div class="link-text"><strong>irctc-refund.online</strong><span>Fake IRCTC refund scam</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="link-item phish-item" href="http://free-rewards2024.win" data-scan="true">
+      <div class="link-icon">🎁</div>
+      <div class="link-text"><strong>free-rewards2024.win</strong><span>Prize / reward scam</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a class="link-item phish-item" href="http://amazon-winner-claim.xyz" data-scan="true">
+      <div class="link-icon">🎯</div>
+      <div class="link-text"><strong>amazon-winner-claim.xyz</strong><span>Fake Amazon winner page</span></div>
+      <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+
+  <!-- Spinner -->
+  <div id="spinner">
+    <div class="spin"></div>
+    <p>Scanning link...</p>
+  </div>
+
+  <!-- Result popup -->
+  <div id="popup">
+    <div class="popup-backdrop" id="backdrop"></div>
+    <div class="popup-sheet" id="sheet">
+      <div id="popup-top" class="popup-top">
+        <div class="handle"></div>
+        <div class="popup-icon" id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-subtitle"></p>
+      </div>
+      <div class="popup-body">
+        <div class="url-box">
+          <div class="label">Scanned URL</div>
+          <div class="url" id="popup-url"></div>
+        </div>
+        <div class="score-bar">
+          <div class="label"><span>Risk score</span><span id="score-label"></span></div>
+          <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+        </div>
+        <div class="reasons" id="popup-reasons"></div>
+      </div>
+      <div class="popup-actions" id="popup-actions"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── Determine backend base URL ──────────────────────────────────────────────
+    // When opened from 192.168.x.x:5173, the Vite proxy forwards /api → localhost:3001
+    // When opened directly or from a different origin, fall back to direct backend URL
+    const BACKEND = window.location.port === '5173'
+      ? ''   // use Vite proxy: /api/check-url
+      : 'http://' + window.location.hostname + ':3001'
+
+    let pendingUrl = null
+
+    // ── Intercept ALL link clicks on this page ──────────────────────────────────
+    document.addEventListener('click', async function(e) {
+      const anchor = e.target.closest('a[data-scan="true"]')
+      if (!anchor) return
+
+      e.preventDefault()
+      e.stopPropagation()
+
+      const url = anchor.getAttribute('href')
+      pendingUrl = url
+
+      showSpinner(true)
+
+      try {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 6000)
+
+        const res = await fetch(BACKEND + '/api/check-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+          signal: controller.signal
+        })
+        clearTimeout(timeout)
+
+        const data = await res.json()
+        showSpinner(false)
+        showPopup(url, data)
+
+      } catch (err) {
+        showSpinner(false)
+        // Backend unreachable — fail open (let link through)
+        if (err.name === 'AbortError') {
+          alert('Backend timeout — opening link directly')
+        }
+        window.open(url, '_blank', 'noopener,noreferrer')
+      }
+    }, true)
+
+    function showSpinner(on) {
+      document.getElementById('spinner').classList.toggle('show', on)
+    }
+
+    function showPopup(url, data) {
+      const isPhishing = data.isPhishing
+      const score      = data.riskScore || 0
+      const reasons    = data.reasons   || []
+
+      const sheet   = document.getElementById('sheet')
+      const topDiv  = document.getElementById('popup-top')
+      const iconDiv = document.getElementById('popup-icon')
+      const title   = document.getElementById('popup-title')
+      const sub     = document.getElementById('popup-subtitle')
+      const urlEl   = document.getElementById('popup-url')
+      const barFill = document.getElementById('bar-fill')
+      const scoreEl = document.getElementById('score-label')
+      const reasonsEl = document.getElementById('popup-reasons')
+      const actionsEl = document.getElementById('popup-actions')
+
+      urlEl.textContent = url
+
+      if (isPhishing) {
+        sheet.className    = 'popup-sheet popup-danger'
+        topDiv.className   = 'popup-top'
+        topDiv.style.background = 'linear-gradient(135deg,#DC2626,#B91C1C)'
+        iconDiv.innerHTML  = '<svg fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24" width="30" height="30"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>'
+        title.textContent  = 'Phishing Link Detected!'
+        sub.textContent    = 'This link may steal your personal data'
+        barFill.style.width = Math.min(score, 100) + '%'
+        barFill.className  = 'bar-fill bar-high'
+        scoreEl.textContent = score + '% risk'
+
+        reasonsEl.innerHTML = (reasons.length
+          ? reasons
+          : ['Suspicious domain detected', 'Not a verified website']
+        ).map(r => `<div class="reason-item"><div class="reason-dot"></div><div class="reason-text">${r}</div></div>`).join('')
+
+        actionsEl.innerHTML = `
+          <button class="btn btn-ghost" onclick="closePopup()">Go back (recommended)</button>
+          <button class="btn btn-danger" onclick="proceedAnyway()">Open anyway — I understand the risk</button>
+        `
+      } else {
+        topDiv.style.background = 'linear-gradient(135deg,#059669,#047857)'
+        iconDiv.innerHTML  = '<svg fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24" width="30" height="30"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/></svg>'
+        title.textContent  = 'Link Looks Safe'
+        sub.textContent    = 'No phishing signals detected'
+        barFill.style.width = Math.max(score, 5) + '%'
+        barFill.className  = 'bar-fill bar-low'
+        scoreEl.textContent = score + '% risk'
+
+        reasonsEl.innerHTML = '<div class="reason-item"><div class="reason-dot" style="background:#10B981"></div><div class="reason-text">No suspicious patterns found</div></div>'
+
+        actionsEl.innerHTML = `
+          <button class="btn btn-safe" onclick="proceedAnyway()">Open link</button>
+          <button class="btn btn-ghost" onclick="closePopup()">Cancel</button>
+        `
+      }
+
+      document.getElementById('popup').classList.add('show')
+    }
+
+    function closePopup() {
+      document.getElementById('popup').classList.remove('show')
+      pendingUrl = null
+    }
+
+    function proceedAnyway() {
+      closePopup()
+      if (pendingUrl) window.open(pendingUrl, '_blank', 'noopener,noreferrer')
+    }
+
+    document.getElementById('backdrop').addEventListener('click', closePopup)
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "appId": "com.linkguard.app",
+  "appName": "LinkGuard",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#F9FAFB"
+  },
+  "plugins": {
+    "App": {
+      "launchUrl": ""
+    }
+  }
+}
