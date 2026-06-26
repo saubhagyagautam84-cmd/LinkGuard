@@ -1,25 +1,36 @@
 import { useState, useCallback } from 'react'
 import { useAndroidIntent } from '../hooks/useAndroidIntent.js'
+import { useClipboardScan } from '../hooks/useClipboardScan.js'
 
 export default function AndroidIntentGuard() {
   const [alert, setAlert] = useState(null) // { url, result }
   const [safeAlert, setSafeAlert] = useState(null)
+  const [source, setSource] = useState('') // 'intent' | 'clipboard'
 
-  const handlePhishing = useCallback((url, result) => {
+  const handlePhishing = useCallback((url, result, src = 'intent') => {
+    setSource(src)
     setAlert({ url, result })
-    // Vibrate on phishing detection
     if (navigator.vibrate) navigator.vibrate([200, 100, 200])
   }, [])
 
-  const handleSafe = useCallback((url, result) => {
+  const handleSafe = useCallback((url, result, src = 'intent') => {
+    setSource(src)
     setSafeAlert({ url, result })
-    setTimeout(() => {
-      setSafeAlert(null)
-      window.open(url, '_system')
-    }, 1500)
+    if (src === 'intent') {
+      setTimeout(() => {
+        setSafeAlert(null)
+        window.open(url, '_system')
+      }, 1500)
+    } else {
+      setTimeout(() => setSafeAlert(null), 3000)
+    }
   }, [])
 
   useAndroidIntent(handlePhishing, handleSafe)
+  useClipboardScan(
+    (url, result) => handlePhishing(url, result, 'clipboard'),
+    (url, result) => handleSafe(url, result, 'clipboard')
+  )
 
   const proceed = () => {
     const url = alert?.url
@@ -48,7 +59,7 @@ export default function AndroidIntentGuard() {
           </svg>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>Link is Safe</p>
+          <p style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>Link is Safe {source === 'clipboard' ? '(from clipboard)' : ''}</p>
           <p style={{ color: '#6EE7B7', fontSize: 11, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{safeAlert.url}</p>
         </div>
       </div>
@@ -78,7 +89,9 @@ export default function AndroidIntentGuard() {
           Phishing Link Detected!
         </h1>
         <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13, textAlign: 'center', lineHeight: 1.5 }}>
-          LinkGuard blocked this link. It may steal your passwords or personal data.
+          {source === 'clipboard'
+            ? 'A dangerous link was found in your clipboard (copied from WhatsApp or another app).'
+            : 'LinkGuard blocked this link. It may steal your passwords or personal data.'}
         </p>
       </div>
 
