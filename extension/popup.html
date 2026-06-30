@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LinkGuard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F9FAFB;
+    }
+    .header {
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header h1 { color: #fff; font-size: 16px; font-weight: 700; }
+    .header p  { color: rgba(255,255,255,0.75); font-size: 11px; margin-top: 2px; }
+
+    .status {
+      background: #fff;
+      margin: 12px;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid #E5E7EB;
+    }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+      flex-shrink: 0;
+    }
+    .status p  { font-size: 13px; color: #111827; font-weight: 600; }
+    .status span { font-size: 11px; color: #6B7280; }
+
+    .info {
+      margin: 0 12px 12px;
+      background: #EEF2FF;
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .info p { font-size: 12px; color: #3730A3; line-height: 1.6; }
+    .info strong { font-weight: 700; }
+
+    .test-btn {
+      display: block;
+      margin: 0 12px 12px;
+      width: calc(100% - 24px);
+      background: #4F46E5;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+    .test-btn:hover { background: #4338CA; }
+
+    .footer {
+      padding: 10px 12px 14px;
+      text-align: center;
+    }
+    .footer p { font-size: 10px; color: #9CA3AF; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">
+      <svg width="22" height="22" fill="none" stroke="white" stroke-width="2.2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+      </svg>
+    </div>
+    <div>
+      <h1>LinkGuard</h1>
+      <p>Phishing Link Detector</p>
+    </div>
+  </div>
+
+  <div class="status">
+    <div class="dot"></div>
+    <div>
+      <p>Protection Active</p>
+      <span>Scanning all links on this page</span>
+    </div>
+  </div>
+
+  <div class="info">
+    <p>
+      <strong>How it works:</strong> LinkGuard automatically scans every link you click.
+      If a link looks dangerous, you'll see a warning before the page opens.
+      Safe links open normally with no delay.
+    </p>
+  </div>
+
+  <a class="test-btn" href="https://paypa1-secure-login.xyz" target="_blank">
+    🧪 Test with a fake phishing link
+  </a>
+
+  <div class="footer">
+    <p>LinkGuard v1.0 · Works on all websites · No data sent to servers</p>
+  </div>
+
+</body>
+</html>
